@@ -19,16 +19,13 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Timer;
-import java.util.TimerTask;
 import android.os.Handler;
-import java.util.logging.LogRecord;
-
 
 public class MainActivity extends ActionBarActivity {
     static Integer i;
+    static Boolean boo=false;
     TextView textview1,textview2;
-    Button button;
+    Button button,button2;
     public static String TAG="TAG";
     Thread thread,threadinitial;
     static Handler handler,handlerinitial;
@@ -40,6 +37,13 @@ public class MainActivity extends ActionBarActivity {
         textview1 = (TextView)findViewById(R.id.textview1);
         textview2 = (TextView)findViewById(R.id.textview2);
         button = (Button)findViewById(R.id.button);
+        button2 = (Button)findViewById(R.id.button2);
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boo = true;
+            }
+        });
         handler = new Handler();
         Message message;
         button.setOnClickListener(new View.OnClickListener() {
@@ -133,8 +137,33 @@ public class MainActivity extends ActionBarActivity {
 
         @Override
         protected String doInBackground(Void... params) {
-            String response ="";
-            String S = "http://spider.nitt.edu/~vishnu/time.php";
+            String response = "";
+            String S = null;
+            if (boo) {
+                S = "http://51ab36db.ngrok.io/";
+                InputStream inputStream = null;
+                try {
+                    URL url = new URL(S);
+                    try {
+                        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                        httpURLConnection.setRequestMethod("GET");
+                        inputStream = httpURLConnection.getInputStream();
+                        Log.d(TAG, inputStream.toString());
+                        BufferedReader buffer = new BufferedReader(new InputStreamReader(inputStream));
+                        String t = "";
+                        while ((t = buffer.readLine()) != null) {
+                            response += t;
+                            Log.d(TAG, response);
+                        }
+                    } catch (IOException e) {
+                    }
+                } catch (MalformedURLException e) {
+
+                }
+
+            } else
+            {
+            S = "http://spider.nitt.edu/~vishnu/time.php";
             InputStream inputStream = null;
             try {
                 URL url = new URL(S);
@@ -154,9 +183,11 @@ public class MainActivity extends ActionBarActivity {
             } catch (MalformedURLException e) {
 
             }
+        }
             return response;
         }
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
